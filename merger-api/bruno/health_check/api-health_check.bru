@@ -1,0 +1,16 @@
+meta {
+  name: /api/health_check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/health_check
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
