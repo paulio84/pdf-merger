@@ -1,0 +1,5 @@
+vars {
+  baseUrl: 
+  fixturesPath: <path/to/your/tests/fixtures>
+}
+color: #346AB2
