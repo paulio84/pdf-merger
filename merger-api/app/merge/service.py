@@ -2,6 +2,12 @@ import io
 
 from fastapi import UploadFile
 from pypdf import PdfWriter
+from pypdf.errors import PdfReadError
+
+from app.merge.exceptions import (
+    MergeInvalidPDFDocument,
+    MergeTooFewDocuments,
+)
 
 
 class MergeService:
@@ -22,13 +28,29 @@ class MergeService:
             A tuple containing:
                 - An in-memory byte stream of the merged PDF.
                 - The constructed filename with the .pdf extension appended.
+
+        Raises:
+            MergeTooFewDocuments: There are fewer than two documents uploaded.
+            MergeInvalidPDFDocument: The PDF document is invalid, e.g. the document cannot be read correctly.
         """
         writer = PdfWriter()
+
+        # Validate there are 2 or more documents to merge.
+        if len(files) < 2:
+            raise MergeTooFewDocuments()
 
         for file in files:
             # Read the uploaded file contents into memory and append to the writer.
             content = await file.read()
-            writer.append(io.BytesIO(content))
+            # Validate that the first 4 bytes start with '%PDF'
+            # this should identify the document as a PDF.
+            if not content.startswith(b"%PDF"):
+                raise MergeInvalidPDFDocument(file.filename or "unknown")
+
+            try:
+                writer.append(io.BytesIO(content))
+            except PdfReadError:
+                raise MergeInvalidPDFDocument(file.filename or "unknown")
 
         # Write the merged PDF to an in-memory byte stream.
         output = io.BytesIO()
