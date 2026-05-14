@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.core.config import settings
 from app.core.exceptions import add_exception_handlers
+from app.core.logging import setup_logging
 from app.router import api_router
 
 
@@ -14,9 +15,11 @@ def create_application() -> FastAPI:
         title=settings.APP_NAME,
     )
 
+    setup_logging()
     app.include_router(api_router)
     add_exception_handlers(app)
 
     return app
+
 
 app = create_application()
