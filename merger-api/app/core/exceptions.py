@@ -1,8 +1,11 @@
+import logging
 from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
 
 
 class ApiException(HTTPException):
@@ -24,6 +27,11 @@ def add_exception_handlers(app: FastAPI) -> None:
     async def _generic_exception_handler(
         request: Request, exc: Exception
     ) -> JSONResponse:
+        logger.error(
+            "Unexpected error occurred",
+            extra={"path": request.url.path},
+            exc_info=True,
+        )
         status_code = HTTPStatus.INTERNAL_SERVER_ERROR.value
         return JSONResponse(
             status_code=status_code,
@@ -58,6 +66,15 @@ def add_exception_handlers(app: FastAPI) -> None:
     async def _api_exception_handler(
         request: Request, exc: ApiException
     ) -> JSONResponse:
+        logger.warning(
+            "API exception raised",
+            extra={
+                "path": request.url.path,
+                "status_code": exc.status_code,
+                "error_code": exc.headers.get("X-Error-Code"),
+                "detail": exc.detail,
+            },
+        )
         return JSONResponse(
             status_code=exc.status_code,
             content={
