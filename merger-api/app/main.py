@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.core.config import settings
 from app.core.exceptions import add_exception_handlers
 from app.core.logging import setup_logging
+from app.core.rate_limiting import setup_rate_limiting
 from app.router import api_router
 
 
@@ -16,8 +17,10 @@ def create_application() -> FastAPI:
     )
 
     setup_logging()
-    app.include_router(api_router)
+    setup_rate_limiting(app)
     add_exception_handlers(app)
+
+    app.include_router(api_router)
 
     return app
 

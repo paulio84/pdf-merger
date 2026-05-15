@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     # App
     APP_NAME: str = "PDF Merger API"
     DEBUG: bool = False
+    RATE_LIMIT: str = "5/minute"
 
 
 settings = Settings()
