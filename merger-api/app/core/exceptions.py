@@ -10,11 +10,8 @@ logger = logging.getLogger(__name__)
 
 class ApiException(HTTPException):
     def __init__(self, status_code: int, detail: str, error_code: str) -> None:
-        super().__init__(
-            status_code=status_code,
-            detail=detail,
-            headers={"X-Error-Code": error_code},
-        )
+        super().__init__(status_code=status_code, detail=detail)
+        self.error_code = error_code
 
 
 def add_exception_handlers(app: FastAPI) -> None:
@@ -28,7 +25,7 @@ def add_exception_handlers(app: FastAPI) -> None:
         request: Request, exc: Exception
     ) -> JSONResponse:
         logger.error(
-            "Unexpected error occurred",
+            "An unexpected error occurred",
             extra={"path": request.url.path},
             exc_info=True,
         )
@@ -39,6 +36,7 @@ def add_exception_handlers(app: FastAPI) -> None:
                 "status_code": status_code,
                 "type": "Exception",
                 "message": "An unexpected error occurred",
+                "error_code": "INTERNAL_SERVER_ERROR",
                 "errors": None,
                 "path": request.url.path,
             },
@@ -56,6 +54,7 @@ def add_exception_handlers(app: FastAPI) -> None:
                 "status_code": status_code,
                 "type": "RequestValidationError",
                 "message": "Schema validation error",
+                "error_code": "VALIDATION_ERROR",
                 "errors": _format_errors(errors=exc.errors()),
                 "path": request.url.path,
             },
@@ -71,16 +70,18 @@ def add_exception_handlers(app: FastAPI) -> None:
             extra={
                 "path": request.url.path,
                 "status_code": exc.status_code,
-                "error_code": exc.headers.get("X-Error-Code"),
+                "error_code": exc.error_code,
                 "detail": exc.detail,
             },
         )
         return JSONResponse(
             status_code=exc.status_code,
+            headers={"X-Error-Code": exc.error_code},
             content={
                 "status_code": exc.status_code,
                 "type": type(exc).__name__,
                 "message": exc.detail,
+                "error_code": exc.error_code,
                 "errors": None,
                 "path": request.url.path,
             },
