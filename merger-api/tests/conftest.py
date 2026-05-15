@@ -1,14 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
 
-# from app.core.config import Settings
-
-# @pytest.fixture(scope="session", autouse=True)
-# def override_settings():
-#     """Load test environment settings."""
-#     from app.core import config
-#     config.settings = Settings(_env_file="tests/.env.test")
-
 
 @pytest.fixture
 def client() -> TestClient:
