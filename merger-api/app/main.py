@@ -9,9 +9,9 @@ from app.router import api_router
 
 
 def create_application() -> FastAPI:
+    """Create and configure a FastAPI application."""
     settings = get_settings()
 
-    """Create and configure a FastAPI application."""
     app = FastAPI(
         debug=settings.debug,
         docs_url="/api/docs" if settings.debug else None,

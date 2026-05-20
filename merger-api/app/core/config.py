@@ -1,4 +1,3 @@
-import os
 from enum import StrEnum
 from functools import lru_cache
 
@@ -24,7 +23,7 @@ class Settings(BaseSettings):
     # App
     app_name: str = "PDF Merger API"
     env: Environment = Environment.DEVELOPMENT
-    rate_limit: str = "5/minute"
+    rate_limit: str = "10/minute"
     cors_allowed_origins: list[str] = []
 
     @property
@@ -33,15 +32,19 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_production_config(self) -> "Settings":
-        required = ["CORS_ALLOWED_ORIGINS", "ENV", "RATE_LIMIT"]
-        missing = [key for key in required if not os.environ.get(key)]
+        missing: list[str] = []
+        if not self.cors_allowed_origins:
+            missing.append("CORS_ALLOWED_ORIGINS")
+        if not self.rate_limit:
+            missing.append("RATE_LIMIT")
+        if not self.env:
+            missing.append("ENV")
 
         if missing:
             raise RuntimeError(
-                f"Missing required environment variables: {', '.join(missing)}. "
+                f"Missing required configuration variables: {', '.join(missing)}. "
                 "Check your .env file or environment configuration."
             )
-
         return self
 
 
