@@ -4,6 +4,7 @@ from http import HTTPStatus
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,33 @@ def add_exception_handlers(app: FastAPI) -> None:
                 "type": type(exc).__name__,
                 "message": exc.detail,
                 "error_code": exc.error_code,
+                "errors": None,
+                "path": request.url.path,
+            },
+        )
+
+    # Handle rate limit exceptions
+    @app.exception_handler(RateLimitExceeded)
+    async def _rate_limit_handler(
+        request: Request, exc: RateLimitExceeded
+    ) -> JSONResponse:
+        logger.warning(
+            "Rate limit exceeded",
+            extra={
+                "path": request.url.path,
+                "status_code": exc.status_code,
+                "error_code": "RATE_LIMIT_EXCEEDED",
+                "detail": exc.detail,
+                "source": "rate_limiter",
+            },
+        )
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "status_code": exc.status_code,
+                "type": type(exc).__name__,
+                "message": "Too many requests made. Please try again later.",
+                "error_code": "RATE_LIMIT_EXCEEDED",
                 "errors": None,
                 "path": request.url.path,
             },

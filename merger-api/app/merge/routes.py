@@ -1,12 +1,15 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
+from app.core.config import get_settings
+from app.core.rate_limiting import limiter
 from app.merge.dependencies import get_merge_service
 from app.merge.service import MergeService
 
 router = APIRouter(prefix="/merge")
+settings = get_settings()
 
 
 # There are no schemas involved in this route.
@@ -24,7 +27,9 @@ router = APIRouter(prefix="/merge")
         }
     },
 )
+@limiter.limit(settings.rate_limit)
 async def merge(
+    request: Request,
     files: list[UploadFile],
     filename: str = "merged",
     service: MergeService = Depends(get_merge_service),
