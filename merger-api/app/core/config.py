@@ -1,5 +1,8 @@
+import os
 from enum import StrEnum
+from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,21 +12,43 @@ class Environment(StrEnum):
 
 
 class Settings(BaseSettings):
+    """
+    Application settings loaded from environment variables.
+    """
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True,
     )
 
     # App
-    APP_NAME: str = "PDF Merger API"
-    ENV: Environment = Environment.DEVELOPMENT
-    RATE_LIMIT: str = "5/minute"
-    CORS_ALLOWED_ORIGINS: str = ""
+    app_name: str = "PDF Merger API"
+    env: Environment = Environment.DEVELOPMENT
+    rate_limit: str = "5/minute"
+    cors_allowed_origins: list[str] = []
 
     @property
-    def DEBUG(self) -> bool:
-        return self.ENV == Environment.DEVELOPMENT
+    def debug(self) -> bool:
+        return self.env == Environment.DEVELOPMENT
+
+    @model_validator(mode="after")
+    def validate_production_config(self) -> "Settings":
+        required = ["CORS_ALLOWED_ORIGINS", "ENV", "RATE_LIMIT"]
+        missing = [key for key in required if not os.environ.get(key)]
+
+        if missing:
+            raise RuntimeError(
+                f"Missing required environment variables: {', '.join(missing)}. "
+                "Check your .env file or environment configuration."
+            )
+
+        return self
 
 
-settings = Settings()
+@lru_cache()
+def get_settings() -> Settings:
+    """
+    Returns cached settings instance.
+    Using lru_cache ensures settings are loaded once.
+    """
+    return Settings()
