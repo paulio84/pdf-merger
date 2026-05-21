@@ -1,9 +1,9 @@
 **/.DS_Store
 **/__pycache__
-**/.venv
+**/[.]venv
 **/.classpath
 **/.dockerignore
-**/.env
+**/.env*
 **/.git
 **/.gitignore
 **/.project
@@ -15,6 +15,7 @@
 **/*.dbmdl
 **/*.jfm
 **/bin
+**/.pytest_cache
 **/charts
 **/docker-compose*
 **/compose.y*ml
@@ -28,3 +29,5 @@ LICENSE
 README.md
 
 **/bruno
+**/tests
+**/pytest.ini

@@ -1,6 +1,15 @@
 # This Dockerfile uses Python Docker Official image.
 ARG PYTHON_VERSION=3.14
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}-alpine AS builder
+WORKDIR /app
+
+# Copy requirements and install the required dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Production stage
+FROM python:${PYTHON_VERSION}-alpine
+WORKDIR /app
 
 # Prevent Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -8,7 +17,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+# Copy the built dependencies from the builder stage
+COPY --from=builder /install /usr/local
+
+# Copy the application code into the container.
+COPY . .
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
@@ -22,22 +35,9 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
-
 # Switch to the non-privileged user to run the application.
 USER appuser
 
-# Copy the source code into the container.
-COPY . .
-
-# Expose the port that the application listens on.
+# Expose the port that the application listens on and run the application.
 EXPOSE 8000
-
-# Run the application.
 CMD ["python3", "-m", "uvicorn", "app.main:app", "--host=0.0.0.0", "--port=8000"]
