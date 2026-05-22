@@ -21,7 +21,7 @@ def create_application() -> FastAPI:
 
     setup_logging()
     setup_rate_limiting(app)
-    # setup CORS
+    # Setup CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_allowed_origins,

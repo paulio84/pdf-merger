@@ -3,9 +3,10 @@ ARG PYTHON_VERSION=3.14
 FROM python:${PYTHON_VERSION}-alpine AS builder
 WORKDIR /app
 
-# Copy requirements and install the required dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+# Copy requirements and install the dependencies for the environment (defaults to prod)
+COPY requirements/ requirements/
+ARG REQUIRE_ENV=prod
+RUN pip install --no-cache-dir --prefix=/install -r requirements/${REQUIRE_ENV}.txt
 
 # Production stage
 FROM python:${PYTHON_VERSION}-alpine
@@ -13,8 +14,8 @@ WORKDIR /app
 
 # Prevent Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
+# Keeps Python from buffering stdout and stderr.
+# To avoid situations where the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
 # Copy the built dependencies from the builder stage

@@ -15,8 +15,8 @@ settings = get_settings()
 # There are no schemas involved in this route.
 # Multipart form data with file uploads can't be modelled as a Pydantic BaseModel for the request.
 # FastAPI handles UploadFile fields directly in the route signature.
-# Also, the success response is a StreamingResponse which also
-# can't be modelled as a Pydantic schema — it's a raw binary stream, used for the attachment.
+# The success response is a StreamingResponse which can't be modelled as a Pydantic schema.
+# It's a raw binary stream, used for the attachment.
 @router.post(
     "/",
     status_code=HTTPStatus.OK.value,
