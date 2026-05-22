@@ -1,0 +1,36 @@
+name: Run Tests
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: merger-api
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Run tests
+        run: pytest
+        env:
+          ENV: ${{ vars.ENV }}
+          RATE_LIMIT: ${{ vars.RATE_LIMIT }}
+          CORS_ALLOWED_ORIGINS: ${{ vars.CORS_ALLOWED_ORIGINS }}
