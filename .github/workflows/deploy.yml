@@ -1,0 +1,40 @@
+name: Build &amp; Push Image
+run-name: Build &amp; Deploy for ${{ github.repository }}.
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: merger-api
+
+jobs:
+  build_and_push:
+    name: Build &amp; Push to GHCR
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository }}:latest \
+            .
+
+      - name: Push Docker Image
+        run: docker push ghcr.io/${{ github.repository }}:latest
