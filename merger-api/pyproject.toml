@@ -1,0 +1,12 @@
+[tool.ruff]
+line-length = 88
+
+
+[tool.ruff.format]
+quote-style = "double"
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = [ "tests" ]
+filterwarnings = "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:slowapi.*"
