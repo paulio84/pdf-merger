@@ -15,11 +15,11 @@ defaults:
 
 jobs:
   lint_test_build:
-    name: Lint, Test & Build Docker Image
+    name: Lint, Test &amp; Build Docker Image
     runs-on: ubuntu-latest
 
     env:
-      PYTHON_VERSION: "3.14.4"
+      PYTHON_VERSION: "3.12"
 
     steps:
       - name: Checkout Code
@@ -35,9 +35,9 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements/dev.txt
+          pip install --no-compile -r requirements/dev.txt
 
-      - name: Lint & Format
+      - name: Lint &amp; Format
         run: |
           ruff check .
           ruff format --check .
