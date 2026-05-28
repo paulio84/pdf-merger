@@ -31,7 +31,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       
       - name: Install Dependencies
-        run: pip install - requirements/dev.txt
+        run: pip install -r requirements/dev.txt
 
       - name: Run Ruff Lint & Format
         run: |
