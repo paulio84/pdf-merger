@@ -1,0 +1,56 @@
+name: CI
+run-name: Continuous Integration for ${{ github.repository }} by @${{ github.actor }}.
+
+on:
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: merger-api
+
+jobs:
+  lint_test_build:
+    name: Lint, Test & Build Docker Image
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: '3.12'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: requirements/dev.txt
+      
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install --no-compile -r requirements/dev.txt
+
+      - name: Lint & Format
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run Tests
+        run: pytest
+        env:
+          ENV: ${{ vars.ENV }}
+          RATE_LIMIT: ${{ vars.RATE_LIMIT }}
+          CORS_ALLOWED_ORIGINS: ${{ vars.CORS_ALLOWED_ORIGINS }}
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t merger-api:${{ github.sha }} \
+            .

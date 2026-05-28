@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # App
     app_name: str = "PDF Merger API"
     env: Environment = Environment.DEVELOPMENT
-    rate_limit: str = "10/minute"
+    rate_limit: str = ""
     cors_allowed_origins: list[str] = []
 
     @property
