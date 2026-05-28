@@ -3,8 +3,8 @@ run-name: Continuous Integration for ${{ github.repository }} by @${{ github.act
 
 on:
   push:
-    branches-ignore: 
-      - main
+    branches: 
+      - "**"
   pull_request:
     branches:
       - main
