@@ -43,3 +43,4 @@ jobs:
         env:
           ENV: ${{ vars.ENV }}
           RATE_LIMT: ${{ vars.RATE_LIMIT }}
+          CORS_ALLOWED_ORIGINS: ${{ vars.CORS_ALLOWED_ORIGINS }}
