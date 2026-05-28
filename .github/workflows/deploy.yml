@@ -1,10 +1,11 @@
-name: Build &amp; Push Image
-run-name: Build &amp; Deploy for ${{ github.repository }}.
+name: Build & Push Image
+run-name: Build & Deploy for ${{ github.repository }}.
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 defaults:
   run:
@@ -12,8 +13,12 @@ defaults:
 
 jobs:
   build_and_push:
-    name: Build &amp; Push to GHCR
+    name: Build & Push to GHCR
     runs-on: ubuntu-latest
+
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
 
     permissions:
       contents: read

@@ -4,7 +4,7 @@ run-name: Continuous Integration for ${{ github.repository }} by @${{ github.act
 on:
   push:
     branches: 
-      - "**"
+      - '**'
   pull_request:
     branches:
       - main
@@ -15,11 +15,11 @@ defaults:
 
 jobs:
   lint_test_build:
-    name: Lint, Test &amp; Build Docker Image
+    name: Lint, Test & Build Docker Image
     runs-on: ubuntu-latest
 
     env:
-      PYTHON_VERSION: "3.12"
+      PYTHON_VERSION: '3.12'
 
     steps:
       - name: Checkout Code
@@ -37,7 +37,7 @@ jobs:
           pip install --upgrade pip
           pip install --no-compile -r requirements/dev.txt
 
-      - name: Lint &amp; Format
+      - name: Lint & Format
         run: |
           ruff check .
           ruff format --check .
