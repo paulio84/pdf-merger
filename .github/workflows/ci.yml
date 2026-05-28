@@ -1,0 +1,45 @@
+name: CI
+run-name: Continuous Integration for ${{ github.repository }} by @${{ github.actor }}.
+
+on:
+  push:
+    branches-ignore: 
+      - main
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: merger-api
+
+jobs:
+  lint_test_build:
+    name: Lint, Test & Build Docker Image
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: "3.14"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install Dependencies
+        run: pip install - requirements/dev.txt
+
+      - name: Run Ruff Lint & Format
+        run: |
+          ruff check .
+          ruff format .
+
+      - name: Run Tests
+        run: pytest
+        env:
+          ENV: ${{ vars.ENV }}
+          RATE_LIMT: ${{ vars.RATE_LIMIT }}
