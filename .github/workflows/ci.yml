@@ -1,5 +1,5 @@
 name: CI
-run-name: Continuous Integration for ${{ github.repository }} by @${{ github.actor }}.
+run-name: CI for ${{ github.repository }} (${{ github.ref }}) by @${{ github.actor }}.
 
 on:
   push:
