@@ -1,5 +1,5 @@
 name: CI
-run-name: CI for ${{ github.repository }} (${{ github.ref }}) by @${{ github.actor }}.
+run-name: CI for ${{ github.repository }} (${{ github.ref_name }}) by @${{ github.actor }}.
 
 on:
   push:
