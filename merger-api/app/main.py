@@ -14,8 +14,9 @@ def create_application() -> FastAPI:
 
     app = FastAPI(
         debug=settings.debug,
-        docs_url="/api/docs" if settings.debug else None,
-        redoc_url="/api/redoc" if settings.debug else None,
+        docs_url="/api/docs",
+        openapi_url="/api/openapi.json",
+        redoc_url="/api/redoc",
         title=settings.app_name,
     )
 
