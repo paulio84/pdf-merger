@@ -2,4 +2,6 @@ from pydantic import BaseModel
 
 
 class HealthCheckResponse(BaseModel):
-    healthy: str
+    status: str
+    description: str
+    version: float

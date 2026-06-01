@@ -14,4 +14,5 @@ class TestHealthEndpoint:
         """Health endpoint returns the expected JSON body."""
         response = client.get("/api/health/")
 
-        assert response.json() == {"healthy": "Yes!"}
+        assert response.json()["status"] == "Ok!"
+        assert response.json()["description"] != ""
