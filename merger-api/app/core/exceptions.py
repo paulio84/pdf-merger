@@ -56,7 +56,7 @@ def add_exception_handlers(app: FastAPI) -> None:
                 "type": "RequestValidationError",
                 "message": "Schema validation error",
                 "error_code": "VALIDATION_ERROR",
-                "errors": _format_errors(errors=exc.errors()),
+                "errors": _format_errors(errors=list(exc.errors())),
                 "path": request.url.path,
             },
         )

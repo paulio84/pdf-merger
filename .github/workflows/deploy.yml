@@ -73,7 +73,7 @@ jobs:
 
       - name: Terraform init
         working-directory: infra/terraform
-        run: terraform init
+        run: terraform init -backend-config="key=pdf-merger-test.tfstate"
 
       - name: Terraform plan
         working-directory: infra/terraform
@@ -156,7 +156,7 @@ jobs:
 
       - name: Terraform init
         working-directory: infra/terraform
-        run: terraform init
+        run: terraform init -backend-config="key=pdf-merger-prod.tfstate"
 
       - name: Terraform plan
         working-directory: infra/terraform

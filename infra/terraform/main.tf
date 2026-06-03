@@ -12,7 +12,6 @@ terraform {
     resource_group_name  = "rg-pdf-merger-tfstate"
     storage_account_name = "pdfmergertfstate"
     container_name       = "tfstate"
-    key                  = "pdf-merger.tfstate"
   }
 }
 
