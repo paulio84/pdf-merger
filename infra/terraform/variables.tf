@@ -4,12 +4,12 @@ variable "subscription_id" {
 }
 
 variable "environment" {
-  description = "Deployment environment name (test or prod)"
+  description = "Deployment environment name (test or production)"
   type        = string
 
   validation {
-    condition     = contains(["test", "prod"], var.environment)
-    error_message = "Environment must be 'test' or 'prod'."
+    condition     = contains(["test", "production"], var.environment)
+    error_message = "Environment must be 'test' or 'production'."
   }
 }
 

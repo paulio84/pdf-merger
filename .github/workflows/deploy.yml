@@ -107,7 +107,7 @@ jobs:
           package-name: pdf-merger
           package-type: container
           min-versions-to-keep: 1
-          ignore-versions: "^(latest|v.*)$"
+          ignore-versions: "^(latest|v*)$"
 
   tag_release_image:
     name: Tag release image
