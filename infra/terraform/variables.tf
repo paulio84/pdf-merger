@@ -38,8 +38,8 @@ variable "max_replicas" {
 }
 
 variable "cors_allowed_origins" {
-  description = "List of allowed CORS origins"
-  type        = list(string)
+  description = "JSON string of allowed CORS origins"
+  type        = string
 }
 
 variable "rate_limit" {

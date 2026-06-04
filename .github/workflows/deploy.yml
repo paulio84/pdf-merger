@@ -56,6 +56,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_and_push
     environment: test
+    defaults:
+      run:
+        working-directory: infra/terraform
 
     steps:
       - name: Checkout code
@@ -71,29 +74,24 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
 
+      - name: Write tfvars
+        run: |
+          cat > ci.tfvars <<EOF
+          subscription_id      = "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          image_tag            = "${{ needs.build_and_push.outputs.image_tag }}"
+          cors_allowed_origins = "${{ secrets.CORS_ALLOWED_ORIGINS }}"
+          rate_limit           = "${{ secrets.RATE_LIMIT }}"
+          environment          = "${{ vars.ENVIRONMENT }}"
+          EOF
+
       - name: Terraform init
-        working-directory: infra/terraform
         run: terraform init -backend-config="key=pdf-merger-test.tfstate"
 
       - name: Terraform plan
-        working-directory: infra/terraform
-        run: |
-          terraform plan \
-            -var="image_tag=${{ needs.build_and_push.outputs.image_tag }}" \
-            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="cors_allowed_origins=${{ secrets.CORS_ALLOWED_ORIGINS }}" \
-            -var="rate_limit=${{ secrets.RATE_LIMIT }}" \
-            -var="environment=${{ vars.ENVIRONMENT }}"
+        run: terraform plan -var-file=ci.tfvars
 
       - name: Terraform apply
-        working-directory: infra/terraform
-        run: |
-          terraform apply -auto-approve \
-            -var="image_tag=${{ needs.build_and_push.outputs.image_tag }}" \
-            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="cors_allowed_origins=${{ secrets.CORS_ALLOWED_ORIGINS }}" \
-            -var="rate_limit=${{ secrets.RATE_LIMIT }}" \
-            -var="environment=${{ vars.ENVIRONMENT }}"
+        run: terraform apply -auto-approve -var-file=ci.tfvars
 
   cleanup:
     name: Cleanup old images
@@ -139,6 +137,9 @@ jobs:
     if: github.event_name == 'release'
     needs: tag_release_image
     environment: prod
+    defaults:
+      run:
+        working-directory: infra/terraform
 
     steps:
       - name: Checkout code
@@ -154,26 +155,21 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
 
+      - name: Write tfvars
+        run: |
+          cat > ci.tfvars <<EOF
+          subscription_id      = "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          image_tag            = "${{ github.ref_name }}"
+          cors_allowed_origins = "${{ secrets.CORS_ALLOWED_ORIGINS }}"
+          rate_limit           = "${{ secrets.RATE_LIMIT }}"
+          environment          = "${{ vars.ENVIRONMENT }}"
+          EOF
+
       - name: Terraform init
-        working-directory: infra/terraform
         run: terraform init -backend-config="key=pdf-merger-prod.tfstate"
 
       - name: Terraform plan
-        working-directory: infra/terraform
-        run: |
-          terraform plan \
-            -var="image_tag=${{ github.ref_name }}" \
-            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="cors_allowed_origins=${{ secrets.CORS_ALLOWED_ORIGINS }}" \
-            -var="rate_limit=${{ secrets.RATE_LIMIT }}" \
-            -var="environment=${{ vars.ENVIRONMENT }}"
+        run: terraform plan -var-file=ci.tfvars
 
       - name: Terraform apply
-        working-directory: infra/terraform
-        run: |
-          terraform apply -auto-approve \
-            -var="image_tag=${{ github.ref_name }}" \
-            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="cors_allowed_origins=${{ secrets.CORS_ALLOWED_ORIGINS }}" \
-            -var="rate_limit=${{ secrets.RATE_LIMIT }}" \
-            -var="environment=${{ vars.ENVIRONMENT }}" 
+        run: terraform apply -auto-approve -var-file=ci.tfvars 
