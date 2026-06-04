@@ -77,7 +77,7 @@ resource "azurerm_container_app" "api" {
 
       env {
         name  = "CORS_ALLOWED_ORIGINS"
-        value = jsonencode(var.cors_allowed_origins)
+        value = var.cors_allowed_origins
       }
     }
   }
