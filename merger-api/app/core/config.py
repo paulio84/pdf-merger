@@ -1,7 +1,7 @@
 from enum import StrEnum
 from functools import lru_cache
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,11 +25,17 @@ class Settings(BaseSettings):
     app_name: str = "PDF Merger API"
     env: Environment = Environment.DEVELOPMENT
     rate_limit: str = ""
-    cors_allowed_origins: list[str] = []
+    cors_allowed_origins: str | list[str] = []
 
     @property
     def debug(self) -> bool:
         return self.env == Environment.DEVELOPMENT
+
+    @field_validator("cors_allowed_origins", mode="before")
+    def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
+        if isinstance(value, list):
+            return value
+        return [origin.strip() for origin in value.split(",")]
 
     @model_validator(mode="after")
     def validate_production_config(self) -> "Settings":
