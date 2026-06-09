@@ -17,6 +17,7 @@ settings = get_settings()
 # FastAPI handles UploadFile fields directly in the route signature.
 # The success response is a StreamingResponse which can't be modelled as a Pydantic schema.
 # It's a raw binary stream, used for the attachment.
+@router.post("", include_in_schema=False)
 @router.post(
     "/",
     status_code=HTTPStatus.OK.value,
