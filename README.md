@@ -4,6 +4,8 @@ A REST API that accepts multiple PDF files and merges them into a single PDF, re
 
 **Live:** [Swagger UI](https://ca-pdf-merger-production.icyrock-1ab134ed.uksouth.azurecontainerapps.io/api/docs) · Deployed on Azure Container Apps
 
+> The container scales to zero when idle. The first request after a period of inactivity may take a few seconds to respond — this is a cold start, not a sign that the service is down.
+
 ---
 
 ## API Reference
